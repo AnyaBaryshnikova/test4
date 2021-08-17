@@ -1,19 +1,24 @@
 package org.example.pages;
 
-        import org.example.managers.DriverManager;
-        import org.example.managers.PageManager;
-        import org.example.managers.TestPropManager;
-        import org.junit.Assert;
-        import org.openqa.selenium.By;
-        import org.openqa.selenium.JavascriptExecutor;
-        import org.openqa.selenium.WebElement;
-        import org.openqa.selenium.interactions.Actions;
-        import org.openqa.selenium.support.FindBy;
-        import org.openqa.selenium.support.PageFactory;
-        import org.openqa.selenium.support.ui.ExpectedConditions;
-        import org.openqa.selenium.support.ui.WebDriverWait;
+import org.example.managers.DriverManager;
+import org.example.managers.PageManager;
+import org.example.managers.TestPropManager;
+import org.junit.Assert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.text.DecimalFormat;
 
 public class BasePage {
+
+    boolean frameFlag = false;
     /**
      * Менеджер WebDriver
      */
@@ -106,26 +111,27 @@ public class BasePage {
 
     /**
      * Отмечаем поля с радиобатонами
+     *
      * @param element элемент, который необходимо отметить
-     * @param value флаг, должна ли быть отмечена кнопка
+     * @param value   флаг, должна ли быть отмечена кнопка
      */
-    protected void fillRadios(WebElement element, boolean value){
+    protected void fillRadios(WebElement element, boolean value) {
         scrollWithOffset(element, 0, 300);
         WebElement chechStatus = element.findElement(By.xpath("./../.."));
         String status = chechStatus.getAttribute("class");
 
-        if(status.contains("checked") & value)
+        if (status.contains("checked") & value)
             return;
 
-        if(status.contains("checked") & !value) {
+        if (status.contains("checked") & !value) {
             element.click();
             return;
         }
 
-        if(!status.contains("checked") & !value)
+        if (!status.contains("checked") & !value)
             return;
 
-        if(!status.contains("checked") & value) {
+        if (!status.contains("checked") & value) {
             element.click();
             return;
         }
@@ -133,31 +139,32 @@ public class BasePage {
 
     /**
      * Заполнение полей со слайдером
+     *
      * @param element элемент, который неоюходимо заполнить
-     * @param value значение
+     * @param value   значение
      */
-    protected void fillSlider(WebElement element, String value){
+    protected void fillSlider(WebElement element, String value) {
         scrollWithOffset(element, 0, 300);
         element.click();
-        element.clear();
-        element.sendKeys(value);
+        element.sendKeys(Keys.chord(Keys.CONTROL, "a"), value);
+        element.sendKeys(Keys.ENTER);
     }
 
-    protected void checkFields(WebElement element, int value){
+    protected void checkFields(WebElement element, int value) {
+        scrollWithOffset(element, 0, 200);
         String credit = element.getText().replaceAll("[^\\d.]", "");
         int sum = Integer.parseInt(credit);
 
-        Assert.assertTrue("Сумма " + sum + " не совпадает с заяленной " + value, sum == value);
+        Assert.assertTrue("Сумма " + sum + " не совпадает с заявленной " + value, sum == value);
     }
 
-    protected void checkFields(WebElement element, double value){
-        String credit = element.getText().substring(0, element.getText().length() - 1);
+    protected void checkFields(WebElement element, double value) {
+        scrollWithOffset(element, 0, 200);
+        String credit = element.getText().substring(0, element.getText().lastIndexOf('%'));
+        credit = credit.replace(',', '.');
         double sum = Double.parseDouble(credit);
 
-        Assert.assertTrue("Сумма необходимого дохода " + sum + " не совпадает с заяленной " + value, sum == value);
+        Assert.assertTrue("Сумма " + sum + " не совпадает с заяленной " + value, sum == value);
     }
-
-
-
 }
 

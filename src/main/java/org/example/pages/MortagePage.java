@@ -1,6 +1,5 @@
 package org.example.pages;
 
-import io.qameta.allure.Step;
 import org.junit.Assert;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -11,6 +10,9 @@ public class MortagePage extends BasePage {
     // Заголовок
     @FindBy(xpath = "//h1")
     WebElement title;
+
+    @FindBy(xpath = "//iframe[@id='iFrameResizer0']")
+    WebElement frame;
 
     // Стоимость недвижимости
     @FindBy(xpath = "//div[contains(text(), 'Стоимость недвижимости')]/../input")
@@ -48,13 +50,14 @@ public class MortagePage extends BasePage {
     @FindBy(xpath = "//div[@data-test-id='main-results-block']//span[text() = 'Процентная ставка']/../span/span")
     WebElement inrestRate;
 
+    private String payment = "";
+
 
     /**
      * Проверка открытия странички ипотеки на вторичное жилье
      *
      * @return возвращаем ту же страничку
      */
-    @Step("Проверям, что открылась страница с ипотекой на вторичное жилье")
     public MortagePage checkOpenMortagePage() {
 
         //waitUtilElementToBeVisible(title);
@@ -71,17 +74,22 @@ public class MortagePage extends BasePage {
      * @param value значение
      * @return
      */
-    @Step("Заполняем поле {name} значением {value}")
     public MortagePage fillSliderInput(String name, String value) {
+        switchToFrame();
+        payment = mounthlyPayment.getText();
+
         switch (name) {
             case "Стоимость жилья":
                 fillSlider(estatePrice, value);
+                wait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(mounthlyPayment, payment)));
                 break;
             case "Первоначальный взнос":
                 fillSlider(initialFee, value);
+                wait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(mounthlyPayment, payment)));
                 break;
             case "Срок кредита":
                 fillSlider(creditTerm, value);
+                wait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(mounthlyPayment, payment)));
                 break;
 
             default:
@@ -99,15 +107,19 @@ public class MortagePage extends BasePage {
      * @param value должна ли кнопка быть нажата
      * @return
      */
-    @Step("Отмечаем кнопку {name} значением {value}")
     public MortagePage fillRaioBtns(String name, String value) {
+        switchToFrame();
+        payment = mounthlyPayment.getText();
+
         boolean bool = Boolean.parseBoolean(value);
         switch (name) {
             case "Молодая семья":
                 fillRadios(newFamily, bool);
+                //wait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(mounthlyPayment, payment)));
                 break;
             case "Страхование жизни":
                 fillRadios(lifeInsurance, bool);
+                //wait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(mounthlyPayment, payment)));
                 break;
 
             default:
@@ -120,18 +132,18 @@ public class MortagePage extends BasePage {
 
     //проверяем значения
 
-    @Step("Проверяем значение поля {name} на соответствие сумме {value}")
     public MortagePage checkFields(String name, String value) {
+        switchToFrame();
         double val = Double.parseDouble(value);
         switch (name) {
             case "Сумма кредита":
-                checkFields(creditSum, (int)val);
+                checkFields(creditSum, (int) val);
                 break;
             case "Ежемесячный платеж":
-                checkFields(mounthlyPayment, (int)val);
+                checkFields(mounthlyPayment, (int) val);
                 break;
             case "Необходимый доход":
-                checkFields(incomeRequired, (int)val);
+                checkFields(incomeRequired, (int) val);
                 break;
             case "Процентная ставка":
                 checkFields(inrestRate, val);
@@ -143,4 +155,13 @@ public class MortagePage extends BasePage {
         return this;
     }
 
+    private void switchToFrame() {
+        if (!frameFlag) {
+            driverManager.getDriver().switchTo().frame(frame);
+            frameFlag = true;
+        }
+    }
+
 }
+
+
